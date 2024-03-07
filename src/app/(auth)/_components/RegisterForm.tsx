@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react'
 import Title from './Title'
 import Image from 'next/image'
@@ -8,6 +10,8 @@ import { Controller } from 'react-hook-form'
 import { IoMdEye, IoMdEyeOff } from "react-icons/io"
 import { PrimaryButton } from '@/styles/Button'
 import Link from 'next/link'
+import { useQuery } from '@tanstack/react-query'
+import * as API from '@/api/Api'
 
 const FormWrapper = styled.form`
   display: flex;
@@ -115,7 +119,7 @@ const RegisterForm = () => {
         name='confirm_password'
         render={({field}) => (
           <Input
-            label='Repeat passwotd'
+            label='Confirm password'
             control={field}
             errors={errors}
             type={showConfirmPassword ? 'text' : 'password'}
