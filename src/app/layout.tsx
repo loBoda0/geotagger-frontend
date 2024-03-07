@@ -18,7 +18,8 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-      <ReactQueryProvider>{children}</ReactQueryProvider></body>
+        <ReactQueryProvider>{children}</ReactQueryProvider>
+      </body>
     </html>
   );
 }
