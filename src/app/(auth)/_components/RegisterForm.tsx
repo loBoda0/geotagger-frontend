@@ -10,8 +10,6 @@ import { Controller } from 'react-hook-form'
 import { IoMdEye, IoMdEyeOff } from "react-icons/io"
 import { PrimaryButton } from '@/styles/Button'
 import Link from 'next/link'
-import { useQuery } from '@tanstack/react-query'
-import * as API from '@/api/Api'
 
 const FormWrapper = styled.form`
   display: flex;
