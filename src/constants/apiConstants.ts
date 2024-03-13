@@ -1,3 +1,4 @@
 export enum apiRoutes {
-  SIGNUP = '/signup'
+  SIGNUP = '/signup',
+  LOGIN = '/login',
 }

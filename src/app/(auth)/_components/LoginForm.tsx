@@ -8,6 +8,10 @@ import { Controller } from 'react-hook-form'
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io'
 import { GoogleButton, PrimaryButton } from '@/styles/Button'
 import Link from 'next/link'
+import { useMutation } from '@tanstack/react-query'
+import * as API from '@/api/Api'
+import { isErrorResponse, isUser } from '@/libs/handleResponse'
+import { useRouter } from 'next/navigation'
 
 const FormWrapper = styled.form`
   display: flex;
@@ -31,25 +35,46 @@ const StyledLink = styled(Link)`
 `
 
 const LoginForm = () => {
-  const { handleSubmit, control, errors  } = useLoginForm()
+  const { handleSubmit, control, errors, setError  } = useLoginForm()
   const [showPassword, setShowPassword] = useState(false)
+  const router = useRouter()
+
+  const mutation = useMutation({
+    mutationFn: (data: LoginUserFields) => (
+      API.signIn(data)
+    ),
+    onSuccess({data}) {
+      if (isErrorResponse(data)) {
+        setError('root', { message: data.message})
+      } else if (isUser(data)) {
+        router.push('/')
+      }
+    },
+    onError(error) {
+      console.log('error:' + error)
+    }
+  })
 
   const togglePassword = () => {
     setShowPassword(val => val = !val)
   }
 
   const onSubmit = handleSubmit(async (data: LoginUserFields) => {
-    console.log(data)
+    mutation.mutateAsync(data)
   })
 
   return (
     <FormWrapper onSubmit={onSubmit}>
+      {
+        JSON.stringify(errors)
+      }
       <Title title='Sign in' subtitle='Welcome back to Geotagger. We are glad that you are back.' />
       <Controller
         control={control}
         name='email'
         render={({field}) => (
           <Input
+            name='email'
             label='Email'
             placeholder='hey@geotagger.com'
             control={field}
@@ -63,6 +88,7 @@ const LoginForm = () => {
         name='password'
         render={({field}) => (
           <Input
+            name='password'
             label='Password'
             control={field}
             errors={errors}

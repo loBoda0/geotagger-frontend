@@ -6,6 +6,7 @@ export type InputType = 'text' | 'email' | 'password' | 'date' | 'number' | 'tex
 
 export type InputProps = {
   label: string
+  name: string
   placeholder?: string
   type?: InputType
   control: any
@@ -46,6 +47,7 @@ const InputField = styled.input`
 
 const Input: React.FC<InputProps> = ({
   label,
+  name,
   placeholder,
   type,
   control,
@@ -69,6 +71,11 @@ const Input: React.FC<InputProps> = ({
           )
         }
       </InputWrapper>
+      {errors[name] && (
+        <div>
+          {errors[name].message}
+        </div>
+      )}
     </InputContainer>
   )
 }

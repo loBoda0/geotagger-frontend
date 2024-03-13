@@ -10,6 +10,10 @@ import { Controller } from 'react-hook-form'
 import { IoMdEye, IoMdEyeOff } from "react-icons/io"
 import { PrimaryButton } from '@/styles/Button'
 import Link from 'next/link'
+import { useMutation } from '@tanstack/react-query'
+import * as API from '@/api/Api'
+import { isErrorResponse, isUser } from '@/libs/handleResponse'
+import { redirect, useRouter } from 'next/navigation'
 
 const FormWrapper = styled.form`
   display: flex;
@@ -39,9 +43,26 @@ const StyledLink = styled(Link)`
 `
 
 const RegisterForm = () => {
-  const { control, errors, handleSubmit } = useRegisterForm()
+  const { control, errors, handleSubmit, setError } = useRegisterForm()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const router = useRouter()
+
+  const mutation = useMutation({
+    mutationFn: (data: RegisterUserFields) => (
+      API.register(data)
+    ),
+    onSuccess({data}) {
+      if (isErrorResponse(data)) {
+        setError('email', { message: data.message})
+      } else if (isUser(data)) {
+        router.push('/login')
+      }
+    },
+    onError(error) {
+      console.log('error:' + error)
+    }
+  })
 
   const togglePassword = () => {
     setShowPassword(val => val = !val)
@@ -52,11 +73,14 @@ const RegisterForm = () => {
   }
 
   const onSubmit = handleSubmit(async (data: RegisterUserFields) => {
-    console.log(data)
+    mutation.mutateAsync(data)
   })
 
   return (
     <FormWrapper onSubmit={onSubmit}>
+      {
+        JSON.stringify(errors)
+      }
       <Title title='Sign up' subtitle='Your name will appear on posts and your public profle.' />
       <Image src={'/avatar.svg'} alt='Avatar' width={64} height={64} />
       <Controller
@@ -64,6 +88,7 @@ const RegisterForm = () => {
         name='email'
         render={({field}) => (
           <Input
+            name='email'
             label='Email'
             placeholder='hey@geotagger.com'
             control={field}
@@ -78,6 +103,7 @@ const RegisterForm = () => {
           name='first_name'
           render={({field}) => (
             <Input
+              name='first_name'
               label='First name'
               placeholder='John'
               control={field}
@@ -90,6 +116,7 @@ const RegisterForm = () => {
           name='last_name'
           render={({field}) => (
             <Input
+              name='last_name'
               label='Last name'
               placeholder='Doe'
               control={field}
@@ -103,6 +130,7 @@ const RegisterForm = () => {
         name='password'
         render={({field}) => (
           <Input
+            name='password'
             label='Password'
             control={field}
             errors={errors}
@@ -117,6 +145,7 @@ const RegisterForm = () => {
         name='confirm_password'
         render={({field}) => (
           <Input
+            name='confirm_password'
             label='Confirm password'
             control={field}
             errors={errors}

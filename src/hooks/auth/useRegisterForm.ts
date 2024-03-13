@@ -7,7 +7,7 @@ export interface RegisterUserFields {
   last_name: string | undefined
   email: string
   password: string
-  confirm_password: string
+  confirm_password?: string
 }
 
 export const useRegisterForm = () =>{
@@ -16,10 +16,6 @@ export const useRegisterForm = () =>{
     last_name: Yup.string().required('Please enter your last name'),
     email: Yup.string().email().required('Please enter a valid email'),
     password: Yup.string()
-      /* .matches(
-        /^(?=.*\d)[A-Za-z.\s_-]+[\w~@#$%^&*+=`|{}:;!.?"()[\]-]{6,}/,
-        'Password must have at least one number, lower or upper case letter and it has to be longer than 5 characters.',
-      ) */
       .required(),
     confirm_password: Yup.string()
       .oneOf([Yup.ref('password')], 'Passwords do not match')
@@ -30,6 +26,7 @@ export const useRegisterForm = () =>{
     handleSubmit,
     formState: { errors },
     control,
+    setError
   } = useForm({
     defaultValues: {
       first_name: '',
@@ -45,6 +42,7 @@ export const useRegisterForm = () =>{
   return {
     handleSubmit,
     errors,
-    control
+    control,
+    setError
   }
 }

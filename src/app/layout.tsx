@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import { ReactQueryProvider } from "@/components/ReactQueryProvider";
+import * as API from '@/api/Api'
 
 const inter = Roboto({ subsets: ["latin"], weight: ['400', '500', '700'] });
 
@@ -15,6 +16,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  /* const response = await API.ConnectionTest()
+  console.log(response.data) */
   return (
     <html lang="en">
       <body className={inter.className}>

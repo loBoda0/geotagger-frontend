@@ -17,6 +17,7 @@ export const useLoginForm = () =>{
     handleSubmit,
     formState: { errors },
     control,
+    setError
   } = useForm({
     defaultValues: {
       email: '',
@@ -29,6 +30,7 @@ export const useLoginForm = () =>{
   return {
     handleSubmit,
     errors,
-    control
+    control,
+    setError
   }
 }

@@ -1,8 +1,9 @@
+import { ErrorResponse } from '@/interfaces/ErrorResponse'
 import axios, { AxiosRequestConfig, AxiosRequestHeaders } from 'axios'
 
 // Default instance
 const axiosInstance = axios.create({
-  baseURL: process.env.BACKEND_URL,
+  baseURL: process.env.REACT_APP_BACKEND_URL,
   timeout: 10000,
   headers: {
       Authorization: undefined
@@ -23,7 +24,7 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => {
     // Extract cookies from the response headers
-    const cookies = response.headers['set-cookie'];
+    /* const cookies = response.headers['set-cookie']; */
 
     // Do something with the cookies if needed
     /* if (cookies) {
@@ -33,7 +34,7 @@ axiosInstance.interceptors.response.use(
     return response
   },
   async (error) => {
-    console.log(error)
+    return error.response
   },
 )
 
@@ -45,8 +46,8 @@ export async function apiRequest<D = Record<string, unknown>, R = unknown>(
     headers?: AxiosRequestHeaders
   } & AxiosRequestConfig,
 ) {
-  const response = await axiosInstance.request<R>({
-    baseURL: process.env.BACKEND_URL,
+  const response = await axiosInstance.request<R | ErrorResponse>({
+    baseURL: process.env.BACKEND_URL || 'http://localhost:8085',
     url: path,
     method: method,
     data: input,
@@ -56,7 +57,6 @@ export async function apiRequest<D = Record<string, unknown>, R = unknown>(
       withCredentials: true
     })
     return response
-   
 }
 
 export * from './User'
