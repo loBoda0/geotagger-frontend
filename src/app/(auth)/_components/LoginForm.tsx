@@ -12,6 +12,7 @@ import { useMutation } from '@tanstack/react-query'
 import * as API from '@/api/Api'
 import { isErrorResponse, isUser } from '@/libs/handleResponse'
 import { useRouter } from 'next/navigation'
+import { useLocalUser } from '@/hooks/useLocalUser'
 
 const FormWrapper = styled.form`
   display: flex;
@@ -47,6 +48,7 @@ const LoginForm = () => {
       if (isErrorResponse(data)) {
         setError('root', { message: data.message})
       } else if (isUser(data)) {
+        useLocalUser.setUser(data)
         router.push('/')
       }
     },
