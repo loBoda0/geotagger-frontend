@@ -22,6 +22,7 @@ const FormWrapper = styled.form`
   justify-content: center;
   align-items: center;
   width: 27rem;
+  max-width: 27rem;
 `
 
 const PersonalInfo = styled.div`

@@ -1,22 +1,26 @@
+'use client'
+
 import Image from 'next/image'
-import React, { ReactComponentElement, ReactNode } from 'react'
+import React from 'react'
+import Menu from './Menu'
+import styled from 'styled-components'
 
-import Logo from '/Logo.svg'
+const MainNavbar = styled.nav`
+  display: flex;
+  padding: 48px 70px;
+  justify-content: space-between;
 
-interface NavbarProps {
-  rightSide?: ReactNode
-}
+  @media (max-width: 768px) {
+    padding: 28px 35px; !important
+  }
+`
 
-const Navbar: React.FC<NavbarProps> = ({rightSide}) => {
+const Navbar: React.FC = () => {
   return (
-    <div>
-      <div className="logo">
-        <Image src={`/Logo.svg`} width={171} height={40} alt="logo" />
-        
-      </div>
-
-      {rightSide}
-    </div>
+    <MainNavbar>
+      <Image src={`/Logo.svg`} width={171} height={40} alt="logo" />
+      <Menu />
+    </MainNavbar>
   )
 }
 

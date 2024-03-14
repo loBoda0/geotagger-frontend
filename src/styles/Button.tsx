@@ -34,6 +34,7 @@ export const GhostButton = styled.button`
   background-color: transparent;
   color: #619B8A;
   border: none;
+  padding: 0;
 `;
 
 export const GoogleButton = styled.button`

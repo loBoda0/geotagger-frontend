@@ -20,7 +20,7 @@ const FormWrapper = styled.form`
   gap: 1rem;
   justify-content: center;
   align-items: center;
-  width: 27rem;
+  max-width: 27rem;
 `
 
 const FormFooter = styled.div`

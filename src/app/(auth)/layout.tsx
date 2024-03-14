@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image';
 import React, { PropsWithChildren } from 'react'
 import styled from 'styled-components'
 
@@ -14,6 +15,7 @@ const LeftSide = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 1rem;
 `;
 
 const RightSide = styled.div`
@@ -26,7 +28,7 @@ const RightSide = styled.div`
   }
 `;
 
-const Image = styled.img`
+const StyledImage = styled(Image)`
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -46,7 +48,7 @@ const layout: React.FC<PropsWithChildren> = ({children}) => {
         <Logo src="/Logo.svg" alt="Authentication Image" />
       <LeftSide>{children}</LeftSide>
       <RightSide>
-        <Image src="/AuthImg.svg" alt="Authentication Image" />
+        <StyledImage src="/AuthImg.svg" alt="Authentication Image" content='fill' width={100} height={100} />
       </RightSide>
     </Container>
   )
