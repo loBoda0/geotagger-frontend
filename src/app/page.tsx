@@ -1,9 +1,12 @@
-import Navbar from "./components/Navbar";
+import { getSession } from "@/hooks/session";
+import Menu from "./components/Menu";
 
-export default function Home() {
+export default async function Home() {
+  const session = await getSession()
+
   return (
     <>
-      <Navbar />
+      <Menu session={session} />
       <h1>Welcome</h1>
     </>
   )

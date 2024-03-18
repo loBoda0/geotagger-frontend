@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
-import { ReactQueryProvider } from "@/components/ReactQueryProvider";
 import * as API from '@/api/Api'
-import { useLocalUser } from "@/hooks/useLocalUser";
 
 const inter = Roboto({ subsets: ["latin"], weight: ['400', '500', '700'] });
 
@@ -17,12 +15,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = useLocalUser.getUser()
-  console.log(user)
+  const data = await API.ConnectionTest()
+  /* console.log(data) */
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ReactQueryProvider>{children}</ReactQueryProvider>
+        {children}
       </body>
     </html>
   );

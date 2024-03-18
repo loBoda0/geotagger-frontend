@@ -6,14 +6,14 @@ import Image from 'next/image'
 import styled from 'styled-components'
 import Input from '@/app/components/Input'
 import { useRegisterForm, RegisterUserFields } from '@/hooks/auth/useRegisterForm'
-import { Controller } from 'react-hook-form'
+import { Controller, SubmitHandler } from 'react-hook-form'
 import { IoMdEye, IoMdEyeOff } from "react-icons/io"
 import { PrimaryButton } from '@/styles/Button'
 import Link from 'next/link'
-import { useMutation } from '@tanstack/react-query'
-import * as API from '@/api/Api'
-import { isErrorResponse, isUser } from '@/libs/handleResponse'
-import { redirect, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import { registerActions } from '@/app/actions/UserAction'
+import { userSchema } from '@/interfaces/user'
+import { errorSchema } from '@/interfaces/error'
 
 const FormWrapper = styled.form`
   display: flex;
@@ -49,22 +49,6 @@ const RegisterForm = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const router = useRouter()
 
-  const mutation = useMutation({
-    mutationFn: (data: RegisterUserFields) => (
-      API.register(data)
-    ),
-    onSuccess({data}) {
-      if (isErrorResponse(data)) {
-        setError('email', { message: data.message})
-      } else if (isUser(data)) {
-        router.push('/login')
-      }
-    },
-    onError(error) {
-      console.log('error:' + error)
-    }
-  })
-
   const togglePassword = () => {
     setShowPassword(val => val = !val)
   }
@@ -73,12 +57,24 @@ const RegisterForm = () => {
     setShowConfirmPassword(val => val = !val)
   }
 
-  const onSubmit = handleSubmit(async (data: RegisterUserFields) => {
-    mutation.mutateAsync(data)
-  })
+  const onSubmit: SubmitHandler<RegisterUserFields> = async data => {
+    const response = await registerActions(data)
+    try {
+      await userSchema.validate(response);
+      router.push('/')
+      console.log('Response is a User');
+    } catch (userValidationError) {
+      try {
+        await errorSchema.validate(response);
+        console.log('Response is an ErrorResponse');
+      } catch (errorResponseValidationError) {
+        console.error('Response does not match User or ErrorResponse schema');
+      }
+    }
+  }
 
   return (
-    <FormWrapper onSubmit={onSubmit}>
+    <FormWrapper onSubmit={handleSubmit(onSubmit)}>
       {
         JSON.stringify(errors)
       }

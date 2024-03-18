@@ -1,16 +1,54 @@
 'use client'
 
-import { useLocalUser } from '@/hooks/useLocalUser'
 import { GhostButton, PrimaryButton } from '@/styles/Button'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { IoIosClose, IoIosMenu } from 'react-icons/io'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import Sidebar from './Sidebar'
+import UserLinks from './UserLinks'
+import Image from 'next/image'
+import { JWTPayload } from 'jose'
 
-interface SidebarContainerProps {
-  isVisible: boolean;
+interface MenuProps {
+  session: JWTPayload | null
 }
+
+const Menu: React.FC<MenuProps> = ({session}) => {
+  const [isSidebarVisible, setSidebarVisible] = useState<boolean>(false)
+
+  const toggleSidebar = () => {
+    setSidebarVisible(!isSidebarVisible)
+  }
+
+  return (
+    <>
+      <MenuWrapper>
+        <Image src={`/Logo.svg`} width={171} height={40} alt="logo" />
+        <Links>
+        {
+          session ? <UserLinks /> : <>
+            <Link href={'/login'}>
+              <GhostButton>Sign in</GhostButton>
+            </Link>
+            or
+            <Link href={'/register'}>
+              <PrimaryButton>Sign up</PrimaryButton>
+            </Link>
+          </>
+        }
+        </Links>
+        <MenuIcon onClick={toggleSidebar} />
+        <SidebarContainer hidden={!isSidebarVisible}>
+          <CloseButton onClick={toggleSidebar} />
+          <Sidebar />
+        </SidebarContainer>
+      </MenuWrapper>
+    </>
+  )
+}
+
+export default Menu
 
 const Links = styled.div`
   display: flex;
@@ -33,20 +71,6 @@ const MenuIcon = styled(IoIosMenu)`
   }
 `
 
-const SidebarContainer = styled.div<SidebarContainerProps>`
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #fff;
-  overflow-y: auto;
-  transform: ${(props) => (props.isVisible ? 'translateX(0)' : 'translateX(100%)')};
-  transition: transform 0.3s ease-in-out;
-  visibility: ${(props) => (props.isVisible ? 'visible' : 'hidden')};
-  opacity: ${(props) => (props.isVisible ? 1 : 0)};
-`
-
 const CloseButton = styled(IoIosClose)`
   position: absolute;
   top: 10px;
@@ -54,43 +78,35 @@ const CloseButton = styled(IoIosClose)`
   font-size: 2rem;
   color: #619B8A;
   cursor: pointer;
-`;
+`
 
-const Menu = () => {
-  const user = useLocalUser.getUser()
-  const [isSidebarVisible, setSidebarVisible] = useState<boolean>(false)
-
-  const toggleSidebar = () => {
-    setSidebarVisible(!isSidebarVisible)
+const slideSidebarAnimation = keyframes`
+  0% {
+    transform: translateX(100%);
   }
-  
-  useEffect(() => {
-    // Delay the appearance of the Sidebar by 0.3 seconds
-    const timeoutId = setTimeout(() => {
-      setSidebarVisible(true);
-    }, 300);
+  100% {
+    width: 100%;
+    transform: translateX(0%);
+  }
+`
 
-    return () => clearTimeout(timeoutId); // Clear the timeout on component unmount
-  }, []);
+const SidebarContainer = styled.div`
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  overflow-y: auto;
+  animation: ${slideSidebarAnimation} .3s;
+`
 
-  return (
-    <>
-      <Links>
-        <Link href={'/login'}>
-          <GhostButton>Sign in</GhostButton>
-        </Link>
-        or
-        <Link href={'/register'}>
-          <PrimaryButton>Sign up</PrimaryButton>
-        </Link>
-      </Links>
-      <MenuIcon onClick={toggleSidebar} />
-      <SidebarContainer as='div' isVisible={!isSidebarVisible}>
-        <CloseButton onClick={toggleSidebar} />
-        <Sidebar />
-      </SidebarContainer>
-    </>
-  )
-}
+const MenuWrapper = styled.nav`
+  display: flex;
+  padding: 48px 70px;
+  justify-content: space-between;
 
-export default Menu
+  @media (max-width: 768px) {
+    padding: 28px 35px; !important
+  }
+`

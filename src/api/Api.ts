@@ -1,36 +1,45 @@
-import { ErrorResponse } from '@/interfaces/ErrorResponse'
-import axios, { AxiosRequestConfig, AxiosRequestHeaders } from 'axios'
+import { getAuthCookies, setAuthCookies } from '@/hooks/session';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse } from 'axios'
+import { parse } from 'cookie';
 
-// Default instance
-const axiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_BACKEND_URL,
+const axiosInstance: AxiosInstance = axios.create({
+  baseURL: process.env.BACKEND_URL,
   timeout: 10000,
   headers: {
-      Authorization: undefined
+      Authorization: undefined,
   },
 })
 
+const extractCookiesFromResponse = (response: AxiosResponse) => {
+  const cookieArray = response.headers['set-cookie'] || [];
+  const cleanedCookies = cookieArray.map(cookieString => cookieString.split(';')[0]);
+  const cookies = cleanedCookies.flatMap(cookieString => Object.entries(parse(cookieString)))
+  .map(([name, value]) => ({ name, value }));
+  return cookies;
+};
+
 axiosInstance.interceptors.request.use(
   async (config) => {
-    return config
+    const sessionCookie = await getAuthCookies();
+    config.headers['Cookie'] = `access_token=${sessionCookie}`;
+    
+    return config;
   },
   (error) => {
     return {
       error: error,
     }
   },
-)
+  )
+  
+  axiosInstance.interceptors.response.use(
+    (response) => {
+      const cookies = extractCookiesFromResponse(response);
+      const access_token = cookies.find(cookie => cookie.name === 'access_token')?.value
+      if (access_token) {
+      setAuthCookies(access_token)
+      }
 
-axiosInstance.interceptors.response.use(
-  (response) => {
-    // Extract cookies from the response headers
-    /* const cookies = response.headers['set-cookie']; */
-
-    // Do something with the cookies if needed
-    /* if (cookies) {
-      // You can parse the cookies or store them as needed
-      console.log('Cookies:', cookies);
-    } */
     return response
   },
   async (error) => {
@@ -46,8 +55,7 @@ export async function apiRequest<D = Record<string, unknown>, R = unknown>(
     headers?: AxiosRequestHeaders
   } & AxiosRequestConfig,
 ) {
-  const response = await axiosInstance.request<R | ErrorResponse>({
-    baseURL: process.env.BACKEND_URL || 'http://localhost:8085',
+  const response = await axiosInstance.request<R>({
     url: path,
     method: method,
     data: input,
@@ -56,7 +64,7 @@ export async function apiRequest<D = Record<string, unknown>, R = unknown>(
       },
       withCredentials: true
     })
-    return response
+    return response.data
 }
 
 export * from './User'

@@ -32,9 +32,10 @@ export const SecondaryButton = styled.button`
 export const GhostButton = styled.button`
   ${buttonStyles}
   background-color: transparent;
-  color: #619B8A;
+  color: #233D4D;
   border: none;
   padding: 0;
+  font-weight: 500;
 `;
 
 export const GoogleButton = styled.button`
